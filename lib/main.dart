@@ -30,11 +30,13 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   final List<Map<String, dynamic>> departments = const [
-    {'name': 'Events', 'icon': Icons.celebration},
+    {'name': 'Admin', 'icon': Icons.admin_panel_settings},
+    {'name': 'Finance and External', 'icon': Icons.account_balance_wallet},
     {'name': 'Marketing', 'icon': Icons.campaign},
-    {'name': 'Finance', 'icon': Icons.account_balance_wallet},
-    {'name': 'Logistics', 'icon': Icons.local_shipping},
-    {'name': 'Internal', 'icon': Icons.groups},
+    {'name': 'Operations', 'icon': Icons.settings},
+    {'name': 'Events', 'icon': Icons.celebration},
+    {'name': 'Graphics', 'icon': Icons.brush},
+    {'name': 'Photography', 'icon': Icons.camera_alt},
   ];
 
   @override
