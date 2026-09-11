@@ -2,7 +2,16 @@ import 'package:flutter/material.dart';
 import '../models/task.dart';
 import '../services/api_service.dart';
 
-const List<String> kDepartments = ['All', 'Events', 'Marketing', 'Finance', 'Logistics', 'Internal'];
+const List<String> kDepartments = [
+  'All',
+  'Admin',
+  'Finance and External',
+  'Marketing',
+  'Operations',
+  'Events',
+  'Graphics',
+  'Photography',
+];
 
 class PresidentDashboard extends StatefulWidget {
   const PresidentDashboard({super.key});
@@ -72,7 +81,7 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
   void _showCreateTaskDialog() {
     final titleController = TextEditingController();
     final assigneeController = TextEditingController();
-    String targetDept = kDepartments[1];
+    String targetDept = kDepartments[1]; // Defaults to 'Admin'
 
     showDialog(
       context: context,
