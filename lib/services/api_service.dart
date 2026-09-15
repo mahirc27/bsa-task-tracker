@@ -56,8 +56,12 @@ class ApiService {
     }
   }
 
-  // Accepts positional parameters (taskId, status) and optional named parameter {pin}
-  static Future<void> updateTaskStatus(int taskId, String status, {String? pin}) async {
+  // Accepts both named arguments (used by department_view and president_dashboard)
+  static Future<void> updateTaskStatus({
+    required int taskId,
+    required String status,
+    String? pin,
+  }) async {
     final response = await http.patch(
       Uri.parse('$baseUrl/tasks/$taskId'),
       headers: {'Content-Type': 'application/json'},
