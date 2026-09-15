@@ -56,7 +56,6 @@ class ApiService {
     }
   }
 
-  // Accepts both named arguments (used by department_view and president_dashboard)
   static Future<void> updateTaskStatus({
     required int taskId,
     required String status,
