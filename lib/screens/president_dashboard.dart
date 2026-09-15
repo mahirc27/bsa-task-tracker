@@ -44,7 +44,10 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
           autofocus: true,
           keyboardType: TextInputType.number,
           maxLength: 4,
-          decoration: const InputDecoration(labelText: 'Enter 4-Digit PIN', border: OutlineInputBorder()),
+          decoration: const InputDecoration(
+            labelText: 'Enter 4-Digit PIN',
+            border: OutlineInputBorder(),
+          ),
         ),
         actions: [
           TextButton(
@@ -81,7 +84,7 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
   void _showCreateTaskDialog() {
     final titleController = TextEditingController();
     final assigneeController = TextEditingController();
-    String targetDept = kDepartments[1]; // Defaults to 'Admin'
+    String targetDept = kDepartments[1];
 
     showDialog(
       context: context,
@@ -103,7 +106,10 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: targetDept,
-                decoration: const InputDecoration(labelText: 'Department', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Department',
+                  border: OutlineInputBorder(),
+                ),
                 items: kDepartments.where((d) => d != 'All').map((d) {
                   return DropdownMenuItem(value: d, child: Text(d));
                 }).toList(),
@@ -114,10 +120,15 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
             ElevatedButton(
               onPressed: () async {
-                if (titleController.text.isNotEmpty && assigneeController.text.isNotEmpty && _pin != null) {
+                if (titleController.text.isNotEmpty &&
+                    assigneeController.text.isNotEmpty &&
+                    _pin != null) {
                   try {
                     await ApiService.createTask(
                       title: titleController.text.trim(),
@@ -146,18 +157,31 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
     );
   }
 
-  Widget _buildStatusColumn(String status, List<Task> tasks) {
+  Widget _buildStatusColumn(String status, List<Task> tasks, {bool isMobileTab = false}) {
     final filtered = tasks.where((t) => t.status == status).toList();
-    return Expanded(
-      child: Card(
-        margin: const EdgeInsets.all(6.0),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('$status (${filtered.length})', style: const TextStyle(fontWeight: FontWeight.bold)),
-              const Divider(),
+
+    Widget content = Card(
+      margin: const EdgeInsets.all(6.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              child: Text(
+                '$status (${filtered.length})',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            const Divider(),
+            if (filtered.isEmpty)
+              const Expanded(
+                child: Center(
+                  child: Text('No tasks here', style: TextStyle(color: Colors.grey)),
+                ),
+              )
+            else
               Expanded(
                 child: ListView.builder(
                   itemCount: filtered.length,
@@ -188,11 +212,12 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                   },
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
+
+    return isMobileTab ? content : Expanded(child: content);
   }
 
   @override
@@ -258,14 +283,21 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                         child: Column(
                           children: [
                             const TabBar(
-                              tabs: [Tab(text: 'Pending'), Tab(text: 'In Progress'), Tab(text: 'Done')],
+                              labelColor: Colors.blueAccent,
+                              unselectedLabelColor: Colors.grey,
+                              indicatorColor: Colors.blueAccent,
+                              tabs: [
+                                Tab(text: 'Pending'),
+                                Tab(text: 'In Progress'),
+                                Tab(text: 'Done'),
+                              ],
                             ),
                             Expanded(
                               child: TabBarView(
                                 children: [
-                                  _buildStatusColumn('Pending', displayTasks),
-                                  _buildStatusColumn('In Progress', displayTasks),
-                                  _buildStatusColumn('Done', displayTasks),
+                                  _buildStatusColumn('Pending', displayTasks, isMobileTab: true),
+                                  _buildStatusColumn('In Progress', displayTasks, isMobileTab: true),
+                                  _buildStatusColumn('Done', displayTasks, isMobileTab: true),
                                 ],
                               ),
                             ),
@@ -274,6 +306,7 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                       );
                     }
                     return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildStatusColumn('Pending', displayTasks),
                         _buildStatusColumn('In Progress', displayTasks),
