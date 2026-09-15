@@ -81,7 +81,6 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                       setDialogState(() => isAuthenticating = true);
 
                       try {
-                        // Test PIN against backend before granting access
                         final initialTasks = await ApiService.fetchTasks(pin: entered);
                         if (mounted) {
                           Navigator.pop(ctx);
@@ -235,8 +234,8 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                           initialValue: task.status,
                           onSelected: (newStatus) async {
                             await ApiService.updateTaskStatus(
-                              taskId: task.id,
-                              status: newStatus,
+                              task.id,
+                              newStatus,
                               pin: _pin?.trim(),
                             );
                             _loadTasks();
