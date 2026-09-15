@@ -56,7 +56,7 @@ class ApiService {
     }
   }
 
-  // Uses positional parameters so department_view.dart compiles cleanly without changes
+  // Accepts positional parameters (taskId, status) and optional named parameter {pin}
   static Future<void> updateTaskStatus(int taskId, String status, {String? pin}) async {
     final response = await http.patch(
       Uri.parse('$baseUrl/tasks/$taskId'),
