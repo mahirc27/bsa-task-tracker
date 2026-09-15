@@ -33,42 +33,79 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
 
   void _promptPinDialog() {
     final pinController = TextEditingController();
+    bool isAuthenticating = false;
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Text('President Authorization'),
-        content: TextField(
-          controller: pinController,
-          obscureText: true,
-          autofocus: true,
-          keyboardType: TextInputType.number,
-          maxLength: 4,
-          decoration: const InputDecoration(
-            labelText: 'Enter 4-Digit PIN',
-            border: OutlineInputBorder(),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('President Authorization'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: pinController,
+                obscureText: true,
+                autofocus: true,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                decoration: const InputDecoration(
+                  labelText: 'Enter 4-Digit PIN',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              if (isAuthenticating) ...[
+                const SizedBox(height: 12),
+                const CircularProgressIndicator(),
+              ],
+            ],
           ),
+          actions: [
+            TextButton(
+              onPressed: isAuthenticating
+                  ? null
+                  : () {
+                      Navigator.pop(ctx);
+                      Navigator.pop(context);
+                    },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: isAuthenticating
+                  ? null
+                  : () async {
+                      final entered = pinController.text.trim();
+                      if (entered.isEmpty) return;
+
+                      setDialogState(() => isAuthenticating = true);
+
+                      try {
+                        // Test PIN against backend before granting access
+                        final initialTasks = await ApiService.fetchTasks(pin: entered);
+                        if (mounted) {
+                          Navigator.pop(ctx);
+                          setState(() {
+                            _pin = entered;
+                            _tasksFuture = Future.value(initialTasks);
+                          });
+                        }
+                      } catch (e) {
+                        setDialogState(() => isAuthenticating = false);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Incorrect PIN. Access Denied.'),
+                              backgroundColor: Colors.redAccent,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              child: const Text('Unlock'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final entered = pinController.text.trim();
-              Navigator.pop(ctx);
-              setState(() {
-                _pin = entered;
-                _loadTasks();
-              });
-            },
-            child: const Text('Unlock'),
-          ),
-        ],
       ),
     );
   }
@@ -76,7 +113,7 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
   void _loadTasks() {
     if (_pin != null) {
       setState(() {
-        _tasksFuture = ApiService.fetchTasks(pin: _pin);
+        _tasksFuture = ApiService.fetchTasks(pin: _pin!.trim());
       });
     }
   }
@@ -131,10 +168,10 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                     _pin != null) {
                   try {
                     await ApiService.createTask(
-                        title: titleController.text.trim(),
-                        assignee: assigneeController.text.trim(),
-                        department: targetDept,
-                        pin: _pin!.trim(),
+                      title: titleController.text.trim(),
+                      assignee: assigneeController.text.trim(),
+                      department: targetDept,
+                      pin: _pin!.trim(),
                     );
                     if (mounted) {
                       Navigator.pop(ctx);
@@ -142,9 +179,12 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                     }
                   } catch (e) {
                     if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error: $e')),
-                        );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: $e'),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
                     }
                   }
                 }
@@ -197,7 +237,7 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                             await ApiService.updateTaskStatus(
                               taskId: task.id,
                               status: newStatus,
-                              pin: _pin,
+                              pin: _pin?.trim(),
                             );
                             _loadTasks();
                           },
