@@ -131,10 +131,10 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                     _pin != null) {
                   try {
                     await ApiService.createTask(
-                      title: titleController.text.trim(),
-                      assignee: assigneeController.text.trim(),
-                      department: targetDept,
-                      pin: _pin!,
+                        title: titleController.text.trim(),
+                        assignee: assigneeController.text.trim(),
+                        department: targetDept,
+                        pin: _pin!.trim(),
                     );
                     if (mounted) {
                       Navigator.pop(ctx);
@@ -142,9 +142,9 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                     }
                   } catch (e) {
                     if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Failed to assign task. Check PIN.')),
-                      );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error: $e')),
+                        );
                     }
                   }
                 }
