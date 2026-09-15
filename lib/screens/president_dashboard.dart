@@ -234,8 +234,8 @@ class _PresidentDashboardState extends State<PresidentDashboard> {
                           initialValue: task.status,
                           onSelected: (newStatus) async {
                             await ApiService.updateTaskStatus(
-                              task.id,
-                              newStatus,
+                              taskId: task.id,
+                              status: newStatus,
                               pin: _pin?.trim(),
                             );
                             _loadTasks();

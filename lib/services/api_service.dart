@@ -7,12 +7,8 @@ class ApiService {
 
   static Future<List<Task>> fetchTasks({String? department, String? pin}) async {
     final Map<String, String> queryParams = {};
-    if (department != null) {
-      queryParams['department'] = department;
-    }
-    if (pin != null && pin.isNotEmpty) {
-      queryParams['pin'] = pin.trim();
-    }
+    if (department != null) queryParams['department'] = department;
+    if (pin != null && pin.isNotEmpty) queryParams['pin'] = pin.trim();
 
     final uri = Uri.parse('$baseUrl/tasks').replace(
       queryParameters: queryParams.isNotEmpty ? queryParams : null,
@@ -60,6 +56,7 @@ class ApiService {
     required int taskId,
     required String status,
     String? pin,
+    String? userName,
   }) async {
     final response = await http.patch(
       Uri.parse('$baseUrl/tasks/$taskId'),
@@ -67,6 +64,7 @@ class ApiService {
       body: jsonEncode({
         'status': status,
         if (pin != null) 'pin': pin.trim(),
+        if (userName != null) 'userName': userName,
       }),
     );
 
